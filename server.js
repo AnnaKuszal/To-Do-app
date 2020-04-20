@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const socket = require('socket.io');
 
 const app = express();
 
@@ -17,3 +18,4 @@ app.use((req, res) => {
   res.status(404).send({message: 'Not found...'});
 });
 
+const io = socket(server);
