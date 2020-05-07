@@ -21,7 +21,7 @@ class App extends React.Component {
     this.setState({ tasks: tasksList});
   };
 
-  removeTask(id) {
+  removeTask(id, isLocalChange) {
     const { tasks } = this.state;
     let index = '';
 
@@ -36,7 +36,9 @@ class App extends React.Component {
       tasks: tasks.filter(item => item.id !== id),
     })
 
-    this.socket.emit('removeTask', index);
+    if (isLocalChange) {
+      this.socket.emit('removeTask', index);
+    }
   }
 
   addTask(task) {
@@ -66,7 +68,7 @@ class App extends React.Component {
             {tasks.map(item => (
               <li key={item.id} className="task">
                 {item.name}
-              <button className="btn btn--red" onClick={() => this.removeTask(item.id)}>Remove</button>
+              <button className="btn btn--red" onClick={() => this.removeTask(item.id, true)}>Remove</button>
               </li>
             ))}
           </ul>
