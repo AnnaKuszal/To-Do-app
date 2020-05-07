@@ -1,6 +1,6 @@
 import React from 'react';
 import io from 'socket.io-client';
-
+const uuidv1 = require('uuid/v1');
 
 class App extends React.Component {
 
@@ -12,43 +12,37 @@ class App extends React.Component {
   componentDidMount() {
     this.socket = io('http://localhost:8000');
     this.socket.on('addTask', (task) => {this.addTask(task)});
-    this.socket.on('removeTask', (id) => {this.removeTask(id)});
+    this.socket.on('removeTask', (taskId) => {this.removeTask(taskId)});
     this.socket.on('updateData', (tasksList) => {this.updateTasks(tasksList)});
-    
   }
   
   updateTasks(tasksList) {
     this.setState({ tasks: tasksList});
   };
 
-  removeTask(id, isLocalChange) {
+  removeTask(taskId, isLocalChange) {
     const { tasks } = this.state;
-    let index = '';
-
-    tasks.filter(item => {
-      if(item.id === id) {
-        index = tasks.indexOf(item);
-      }
-      return index;
-    });
 
     this.setState({
-      tasks: tasks.filter(item => item.id !== id),
+      tasks: tasks.filter(item => item.id !== taskId),
     })
 
     if (isLocalChange) {
-      this.socket.emit('removeTask', index);
+      this.socket.emit('removeTask', taskId);
     }
   }
 
-  addTask(task) {
-    this.setState({ tasks: [...this.state.tasks, task] });
+  addTask(newTask) {
+    this.setState({ tasks: [...this.state.tasks, newTask] });
   }
 
   submitForm(e) {
+    const { taskName } = this.state;
+
     e.preventDefault();
-    this.addTask({ name: this.state.taskName });     //{ id: id, name: this.state.taskName}
-    this.socket.emit('addTask', { name: this.state.taskName });
+    const newTask = { id: uuidv1(), name: taskName };
+    this.addTask(newTask);     //{ id: id, name: this.state.taskName}
+    this.socket.emit('addTask', newTask);
   }
 
   render() {
