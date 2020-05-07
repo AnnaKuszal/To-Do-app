@@ -1,16 +1,12 @@
 const express = require('express');
-const path = require('path');
 const socket = require('socket.io');
 
 const app = express();
 
-const tasks = [];
-
-app.use(express.static(path.join(__dirname + '/client')));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '/client/public/index.html'));
-});
+const tasks = [
+  { id: 'dfsadf324s', name: 'Shopping'}, 
+  { id: 'dfs2ad6724s', name: 'Go out with a dog'}
+];
 
 const server = app.listen(process.env.PORT || 8000, () => {
   console.log('Server is running...');
@@ -33,10 +29,10 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('addTask', task);
   });
 
-  socket.on('removeTask', (index) => {
-    console.log('Task with id ' + index + ' removed');
-    socket.broadcast.emit('removeTask', index);
-    tasks.splice(index, 1);
+  socket.on('removeTask', (taskId) => {
+    console.log('Task with id ' + taskId + ' removed');
+    socket.broadcast.emit('removeTask', taskId);
+    tasks.splice(taskId, 1);
   });
 
 
